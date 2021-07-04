@@ -1,0 +1,62 @@
+# This workflow will build a docker container, publish it to Google Container Registry, and deploy it to Google App Engine(Standard) when code is pushed to master branch
+#
+# To configure this workflow:
+#
+# 1. Ensure that your repository contains the necessary configuration for your Google App Engine, including app.yaml, docker file to build image.
+# 2. Set up secrets in your github repository: PROJECT_ID with the id of the project and GOOGLE_APPLICATION_CREDENTIALS with the JSON service account key created for your service account in your google cloud project.
+
+name: Build and Deploy to Google Cloud App Engine
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  GCP_PROJECT: ${{ secrets.PROJECT_ID }}
+
+jobs:
+  setup-build-publish-deploy:
+    name: Setup, Build, Publish, and Deploy to Google App Engine
+    runs-on: ubuntu-latest
+
+    steps:
+    #Checkout the repository code
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Setup gcloud CLI
+    - name: Setup gcloud CLI
+      uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+        service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        project_id: ${{ secrets.PROJECT_ID }}
+        export_default_credentials: true 
+
+    # Enable Required APIs on project
+    - name: Enable APIs
+      run: gcloud services enable serviceusage.googleapis.com  logging.googleapis.com cloudresourcemanager.googleapis.com containerregistry.googleapis.com admin.googleapis.com appengine.googleapis.com storage-api.googleapis.com
+
+    # Register gcloud as Docker Credential Helper
+    - name: Configure Docker and Install Beta
+      run:  gcloud auth configure-docker --quiet
+
+    # Pull previously pushed stages(if any), Build the Docker image using cache and push it to registry
+    - uses: whoan/docker-build-with-cache-action@v5
+      with:
+        username: _json_key
+        password: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        registry: eu.gcr.io
+        image_name: codecomp-dotnet-bot
+
+    # Create App Engine in your GCP Project
+    - name: Create App Engine
+      continue-on-error: true #otherwise will give error on pipeline re-run since app engine creation process is irreversible
+      run: gcloud app create --region=europe-west
+
+
+    # Deploy the Application to App Engine
+    - name: Deploy the application to Google App Engine
+      run: |-
+        gcloud app deploy --version=dotnet-bot --project=$GCP_PROJECT --image-url=eu.gcr.io/$GCP_PROJECT/codecomp-dotnet-bot --appyaml=app.yaml
