@@ -15,7 +15,7 @@ We have written all boilerplate code to get you started within 5 minutes. You ku
 ## Final Competition Day
 - You need to deploy your algo in Google Cloud Platform to connect to game server.
 - You can fork this repository, modify algo, check-in and deploy into Google Cloud from your github repository.
--  Step-by-step guide to deploy a Java application on google cloud is given below:
+-  Step-by-step guide to deploy a Dotnet application on google cloud is given below:
 
 ## Step-by-step guide
 
