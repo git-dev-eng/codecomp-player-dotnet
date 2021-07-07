@@ -70,7 +70,6 @@ namespace codecomp.player
                     return httpClient;
                 });
 
-                Console.WriteLine("Hello");
                 services.AddScoped<IApiHandler, ApiHandler>();
                 services.AddScoped<IAlgo, Algo>();
 

@@ -50,12 +50,12 @@ namespace codecomp.player
                     throw new InvalidOperationException("To begin, put your team name and password into appsettings.json");
 
                 var currentGameStatus = await _api.GetGameStatus(); //Fetch current game status
-                _logger.LogInformation($"{DateTime.Now} Round {currentGameStatus.RoundNumber} status is {currentGameStatus.Status}");
+                // _logger.LogInformation($"{DateTime.Now} Round {currentGameStatus.RoundNumber} status is {currentGameStatus.Status}");
+                _logger.LogInformation($"GameId: {currentGameStatus.GameId}\nRound Number: {currentGameStatus.RoundNumber}\nStatus: {currentGameStatus.Status}\n#Participants: {currentGameStatus.Participants.Count}");
 
                 //I need to join the game once, within a specific "joining" phase (starting of each round)
                 var haveIJoinedOnce = currentGameStatus.Participants.Any(member => member.TeamId == _appSettings.Team);
                 var isAlive = currentGameStatus.Participants.Any(member => member.IsAlive);
-
 
                 switch (currentGameStatus.Status.ToUpperInvariant())
                 {
@@ -83,7 +83,6 @@ namespace codecomp.player
 
                                 if (myAction.Guesses.Count > 0)
                                 {
-                                    Console.WriteLine(myAction.Guesses.Count);
                                     //My action
                                     var myActionResponse = await _api.Action(myAction);
 
@@ -94,13 +93,14 @@ namespace codecomp.player
                                     else
                                     {
                                         int totalGuessScore = 0;
+                                        _logger.LogInformation("Guess Successful:\n");
                                         foreach (var score in myActionResponse.Guesses)
                                         {
                                             totalGuessScore += score.Score;
+                                            _logger.LogInformation($"Score: {score.Score}\nTeam: {score.TargetTeam}");
 
                                         }
-                                        _logger.LogInformation($"{totalGuessScore}");
-                                        _logger.LogInformation($"{myActionResponse.RequestId}");
+                                        _logger.LogInformation($"Total Score Obtained: {totalGuessScore}\nRequestId: {myActionResponse.RequestId}");
 
                                     }
 

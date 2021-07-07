@@ -29,7 +29,7 @@ namespace codecomp.player.Model
     {
         public string TeamId { get; set; }
         public bool IsRobot { get; set; }
-
+        public List<string> KilledBy { get; set; }
         public bool IsAlive { get; set; }
     }
 

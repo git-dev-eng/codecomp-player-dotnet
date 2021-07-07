@@ -29,14 +29,16 @@ namespace codecomp.player
 
         public MyAction GetMyAction(GameStatus currentGameStatus)
         {
-            //Yes, you find me DUMB :( make me smart
+            // I only guess for teams who are alive and for those whose 
+			// secret I haven't cracked yet. Am I already not smart? Everyone says I am a dumb bot. :(
+			// Help me to prove them wrong. Make me smarter.	
 
             var myGuess = new List<MyGuess>();
             var legalParticipants = new List<Participant>();
 
             foreach (var participant in currentGameStatus.Participants)
             {
-                if (participant.IsAlive && participant.TeamId != _appSettings.Team)
+                if (participant.IsAlive && participant.TeamId != _appSettings.Team && (participant.KilledBy == null || !participant.KilledBy.Contains(_appSettings.Team)))
                 {
                     legalParticipants.Add(new Participant { TeamId = participant.TeamId, IsAlive = participant.IsAlive, IsRobot = participant.IsRobot });
                 }

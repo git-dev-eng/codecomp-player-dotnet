@@ -8,9 +8,9 @@
 name: Build and Deploy to Google Cloud App Engine
 
 on:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   workflow_dispatch:
 
 env:
