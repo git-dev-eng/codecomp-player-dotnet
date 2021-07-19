@@ -60,6 +60,10 @@ namespace codecomp.player.Model
     {
         public string TargetTeam { get; set; }
         public int Score { get; set; }
+        public string Guess { get; set; }
+        public int NoOfDigitsMatchedByPositionAndValue { get; set; }
+        public int NoOfDigitsMatchedByValue { get; set; }
+        public bool IsValid { get; set; }
     }
     public class MyActionResponse
     {
